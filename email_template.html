@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Template</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+
+        .header img {
+            max-width: 150px;
+        }
+
+        .content {
+            margin: 20px 0;
+        }
+
+        .content h2 {
+            color: #333;
+        }
+
+        .cart-details {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .cart-details th,
+        .cart-details td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .cart-details th {
+            background-color: #f4f4f4;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #777;
+        }
+
+        .emailjs-footer {
+            display: none;
+            /* Attempt to hide the EmailJS footer */
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #000;
+        }
+
+        .divider span {
+            padding: 0 10px;
+        }
+
+        .address-columns {
+            display: flex;
+            justify-content: left;
+            margin-top: 20px;
+        }
+
+        .address-column {
+            width: 48%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="assets/logo.jpeg" alt="Website Logo">
+            <h1>Order Confirmation</h1>
+        </div>
+        <div class="content">
+            <h2>Thank you for your order, {{username}}!</h2>
+            <p>Your order is on-hold until we confirm payment has been received. Your order details are shown below for
+                your reference:</p>
+            <h1>Our bank details</h1>
+            <h2>Account Name : FireFest Crackers</h2>
+            <ul>
+                <li>Bank: XYZ BANK</li>
+                <li>Account number: 123456789</li>
+                <li>IFSC: XYZ0006172</li>
+            </ul>
+            <div class="divider">
+                <span>ORDER DETAILS</span>
+            </div>
+
+            <table class="cart-details">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        {{cartItems}}
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" style="text-align: right;">Subtotal</td>
+                        <td>{{orderSubtotal}}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" style="text-align: right;">Shipping</td>
+                        <td>{{orderShipping}}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" style="text-align: right; font-weight: bold;">Total</td>
+                        <td style="font-weight: bold;">{{orderTotal}}</td>
+                    </tr>
+                </tfoot>
+            </table>
+            <h3>Alternative Mobile No : 1234567890</h3>
+            <div class="address-columns">
+                <div class="address-column">
+                    <h3>Billing Address :</h3>
+                    <p>{{billingAddress}}</p>
+                </div>
+                
+            </div>
+            <div class="footer">
+                <p>If you have any questions, please contact us at support@example.com</p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
