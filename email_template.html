@@ -29,6 +29,9 @@
 
         .header img {
             max-width: 150px;
+            pointer-events: none; /* Disables interaction */
+            user-select: none; /* Disables text selection */
+            -webkit-user-drag: none; /* Disables dragging in webkit browsers */
         }
 
         .content {
@@ -56,15 +59,29 @@
         }
 
         .footer {
-            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-top: 20px;
             font-size: 0.9em;
             color: #777;
+            padding: 10px 0;
+            border-top: 1px solid #f0f0f0;
+            max-width: 100%;
         }
 
-        .emailjs-footer {
-            display: none;
-            /* Attempt to hide the EmailJS footer */
+        .footer img {
+            max-width: 100px;
+            pointer-events: none; /* Disables interaction */
+            user-select: none; /* Disables text selection */
+            -webkit-user-drag: none; /* Disables dragging in webkit browsers */
+            margin-right: auto;
+        }
+
+        .footer p {
+            text-align: right;
+            flex-grow: 1;
+            margin-left: auto;
         }
 
         .divider {
@@ -88,11 +105,11 @@
         .address-columns {
             display: flex;
             justify-content: left;
-            margin-top: 20px;
+            margin-top: 5px;
         }
 
         .address-column {
-            width: 48%;
+            width: 70%;
         }
     </style>
 </head>
@@ -100,15 +117,15 @@
 <body>
     <div class="container">
         <div class="header">
-            <img src="assets/logo.jpeg" alt="Website Logo">
-            <h1>Order Confirmation</h1>
+            <a href="https://your-website.com" target="_blank">
+                <img src="cid:logo" alt="Website Logo">
+            </a>
         </div>
         <div class="content">
             <h2>Thank you for your order, {{username}}!</h2>
-            <p>Your order is on-hold until we confirm payment has been received. Your order details are shown below for
-                your reference:</p>
-            <h1>Our bank details</h1>
-            <h2>Account Name : FireFest Crackers</h2>
+            <p>Your order is on-hold until we confirm payment has been received. Your order details are shown below for your reference:</p>
+            <h2>Our bank details</h2>
+            <h2>Account Name: FireFest Crackers</h2>
             <ul>
                 <li>Bank: XYZ BANK</li>
                 <li>Account number: 123456789</li>
@@ -117,6 +134,7 @@
             <div class="divider">
                 <span>ORDER DETAILS</span>
             </div>
+            <h4>Order Number : {{ordernumber}}</h4>
 
             <table class="cart-details">
                 <thead>
@@ -147,17 +165,26 @@
                     </tr>
                 </tfoot>
             </table>
-            <h3>Alternative Mobile No : 1234567890</h3>
+            <h4>Alternative Mobile No: 1234567890</h4>
             <div class="address-columns">
                 <div class="address-column">
-                    <h3>Billing Address :</h3>
-                    <p>{{billingAddress}}</p>
+                    <h3>Billing Address:</h3>
+                    <p>{{addressLine1}}</p>
+                    <p>{{addressLine2}}</p>
+                    <p>{{city}}, {{state}}, {{pincode}}</p>
+                    <p>{{mobile}}</p>
+                    <p>{{email}}</p>
                 </div>
-                
             </div>
-            <div class="footer">
-                <p>If you have any questions, please contact us at support@example.com</p>
-            </div>
+        </div>
+        <div class="footer">
+            <a href="https://your-website.com" target="_blank">
+                <img src="cid:logo" alt="Website Logo">
+            </a>
+            <p>
+                For any queries, mail us at<br> firefest@gmail.com<br>
+                call us on +91 12345 67890, +91 12345 67890
+            </p>
         </div>
     </div>
 </body>

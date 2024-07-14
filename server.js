@@ -5,6 +5,7 @@ const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
 
+
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
@@ -37,7 +38,7 @@ function calculateTotal(cartItems) {
 
 
 app.post('/send-email', (req, res) => {
-  const { username, email, mobile, state, city, addressLine1, addressLine2, cartItems } = req.body;
+  const { username, email, mobile, state, city, addressLine1, addressLine2, cartItems, pincode, ordernumber } = req.body;
 
   const cartItemsHtml = cartItems.map(item => `
   <tr>
@@ -59,38 +60,28 @@ app.post('/send-email', (req, res) => {
       .replace('{{username}}', username)
       .replace('{{cartItems}}', cartItemsHtml)
       .replace('{{orderSubtotal}}', calculateSubtotal(cartItems))
-  .replace('{{orderShipping}}', calculateShipping())
-  .replace('{{orderTotal}}', calculateTotal(cartItems));
+      .replace('{{orderShipping}}', calculateShipping())
+      .replace('{{addressLine1}}', addressLine1)
+      .replace('{{addressLine2}}', addressLine2)
+      .replace('{{state}}', state)
+      .replace('{{city}}', city)
+      .replace('{{mobile}}', mobile)
+      .replace('{{email}}', email)
+      .replace('{{pincode}}',pincode)
+      .replace('{{ordernumber}}',ordernumber)
+      .replace('{{orderTotal}}', calculateTotal(cartItems));
+
 
     const mailOptions = {
       from: 'Kesavakumarmtsa1622@gmail.com',
       to: email,
-      subject: 'Order Confirmation',
-      text: `
-        Hi ${username},
-    
-        Your order has been confirmed with the following details:
-    
-        Mobile: ${mobile}
-        State: ${state}
-        City: ${city}
-        Address Line 1: ${addressLine1}
-        Address Line 2: ${addressLine2}
-        Cart Items: ${JSON.stringify(cartItems, null, 2)}
-    
-        Thank you for your order!
-      `,
+      subject: 'Your FireFest order has been received',
       html: htmlContent,
       attachments: [
         {
           filename: 'logo.jpeg',
           path: path.join(__dirname, 'assets/logo.jpeg'),
-          cid: 'logo' // same cid value as in the html img src
-        },
-        {
-          filename: 'attachment.jpg',
-          path: 'https://images.app.goo.gl/B3zXT9AXBm362Ru89',
-          cid: 'attachment'
+          cid: 'logo'
         }
       ]
     };
