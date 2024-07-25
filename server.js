@@ -15,8 +15,8 @@ const transporter = nodemailer.createTransport({
   port: 465,
   secure: true,
   auth: {
-    user: 'kesavakumarmtsa1622@gmail.com',
-    pass: 'fdqv parn cedl kpyo'
+    user: 'deepamcrackerssvks@gmail.com',
+    pass: 'dtur mlly tkcn lzby'
   },
   tls: {
     rejectUnauthorized: false
@@ -73,14 +73,14 @@ app.post('/send-email', (req, res) => {
 
 
     const mailOptions = {
-      from: 'Kesavakumarmtsa1622@gmail.com',
+      from: 'deepamcrackerssvks@gmail.com',
       to: email,
-      subject: 'Your FireFest order has been received',
+      subject: 'Your Deepam Crackers order has been received',
       html: htmlContent,
       attachments: [
         {
-          filename: 'logo.jpeg',
-          path: path.join(__dirname, 'assets/logo.jpeg'),
+          filename: 'logo.png',
+          path: path.join(__dirname, 'assets/logo.png'),
           cid: 'logo'
         }
       ]
