@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Order Notification</title>
+    <style>
+        /* Keep the existing styles, but you may want to adjust colors or add admin-specific styling */
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="cid:logo" alt="Website Logo">
+        </div>
+        <div class="content">
+            <h2>New Order Received</h2>
+            <p>A new order has been placed. Details are as follows:</p>
+            
+            <div class="divider">
+                <span>ORDER DETAILS</span>
+            </div>
+            <h4>Order Number: {{ordernumber}}</h4>
+            <h4>Customer Name: {{username}}</h4>
+
+            <table class="cart-details">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        {{cartItems}}
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" style="text-align: right;">Subtotal</td>
+                        <td>{{orderSubtotal}}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" style="text-align: right;">Shipping</td>
+                        <td>{{orderShipping}}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" style="text-align: right; font-weight: bold;">Total</td>
+                        <td style="font-weight: bold;">{{orderTotal}}</td>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <h3>Customer Details:</h3>
+            <p>Name: {{username}}</p>
+            <p>Email: {{email}}</p>
+            <p>Mobile: {{mobile}}</p>
+            <p>Alternative Mobile: 1234567890</p>
+
+            <div class="address-columns">
+                <div class="address-column">
+                    <h3>Billing Address:</h3>
+                    <p>{{addressLine1}}</p>
+                    <p>{{addressLine2}}</p>
+                    <p>{{city}}, {{state}}, {{pincode}}</p>
+                </div>
+            </div>
+
+            <h3>Payment Status: On Hold</h3>
+            <p>Please verify the payment and process the order accordingly.</p>
+            
+        </div>
+        <div class="footer">
+            <img src="cid:logo" alt="">
+            <p>
+                This is an automated admin notification.<br>
+                For internal use only.
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>
