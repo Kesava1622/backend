@@ -125,13 +125,13 @@ app.post('/send-email', (req, res) => {
   });
 });
 
-const PORT = 3000;
+const PORT = 5000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
 
 app.post('/send-admin-email', (req, res) => {
-  const { username, email, mobile, state, city, addressLine1, addressLine2, cartItems, pincode, ordernumber, pdfUrl } = req.body;
+  const { username, email, mobile, state, city, addressLine1, addressLine2, cartItems, pincode, ordernumber} = req.body;
 
   const cartItemsHtml = cartItems.map(item => `
   <tr>
@@ -162,8 +162,8 @@ app.post('/send-admin-email', (req, res) => {
       .replace('{{email}}', email)
       .replace('{{pincode}}', pincode)
       .replace('{{ordernumber}}', ordernumber)
-      .replace('{{orderTotal}}', calculateTotal(cartItems))
-      .replace('{{pdfUrl}}', pdfUrl || '#');
+      .replace('{{orderTotal}}', calculateTotal(cartItems));
+      
 
     const mailOptions = {
       from: 'deepamcrackerssvks@gmail.com',
