@@ -96,19 +96,19 @@ app.post('/send-email', (req, res) => {
     }
 
     const htmlContent = data
-      .replace('{{username}}', username)
-      .replace('{{cartItems}}', cartItemsHtml)
-      .replace('{{orderSubtotal}}', calculateSubtotal(cartItems))
-      .replace('{{orderShipping}}', calculateShipping())
-      .replace('{{addressLine1}}', addressLine1)
-      .replace('{{addressLine2}}', addressLine2)
-      .replace('{{state}}', state)
-      .replace('{{city}}', city)
-      .replace('{{mobile}}', mobile)
-      .replace('{{email}}', email)
-      .replace('{{pincode}}',pincode)
-      .replace('{{ordernumber}}',ordernumber)
-      .replace('{{orderTotal}}', calculateTotal(cartItems));
+      .replaceAll('{{username}}', username)
+      .replaceAll('{{cartItems}}', cartItemsHtml)
+      .replaceAll('{{orderSubtotal}}', calculateSubtotal(cartItems))
+      .replaceAll('{{orderShipping}}', calculateShipping())
+      .replaceAll('{{addressLine1}}', addressLine1)
+      .replaceAll('{{addressLine2}}', addressLine2)
+      .replaceAll('{{state}}', state)
+      .replaceAll('{{city}}', city)
+      .replaceAll('{{mobile}}', mobile)
+      .replaceAll('{{email}}', email)
+      .replaceAll('{{pincode}}',pincode)
+      .replaceAll('{{ordernumber}}',ordernumber)
+      .replaceAll('{{orderTotal}}', calculateTotal(cartItems));
 
 
     const mailOptions = {
@@ -164,19 +164,19 @@ console.log(cartItems);
     }
 
     const htmlContent = data
-      .replace('{{username}}', username)
-      .replace('{{cartItems}}', cartItemsHtml)
-      .replace('{{orderSubtotal}}', calculateSubtotal(cartItems))
-      .replace('{{orderShipping}}', calculateShipping())
-      .replace('{{addressLine1}}', addressLine1)
-      .replace('{{addressLine2}}', addressLine2)
-      .replace('{{state}}', state)
-      .replace('{{city}}', city)
-      .replace('{{mobile}}', mobile)
-      .replace('{{email}}', email)
-      .replace('{{pincode}}', pincode)
-      .replace('{{ordernumber}}', ordernumber)
-      .replace('{{orderTotal}}', calculateTotal(cartItems));
+      .replaceAll('{{username}}', username)
+      .replaceAll('{{cartItems}}', cartItemsHtml)
+      .replaceAll('{{orderSubtotal}}', calculateSubtotal(cartItems))
+      .replaceAll('{{orderShipping}}', calculateShipping())
+      .replaceAll('{{addressLine1}}', addressLine1)
+      .replaceAll('{{addressLine2}}', addressLine2)
+      .replaceAll('{{state}}', state)
+      .replaceAll('{{city}}', city)
+      .replaceAll('{{mobile}}', mobile)
+      .replaceAll('{{email}}', email)
+      .replaceAll('{{pincode}}', pincode)
+      .replaceAll('{{ordernumber}}', ordernumber)
+      .replaceAll('{{orderTotal}}', calculateTotal(cartItems));
       
 
     const mailOptions = {
