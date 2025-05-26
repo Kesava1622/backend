@@ -4,8 +4,13 @@
  * @returns {string} The subtotal of the cart items, formatted as a string with two decimal places.
  */
 function calculateSubtotal(cartItems) {
-  return cartItems.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2);
+  return cartItems.reduce((total, item) => {
+    const price = parseFloat(item.price) || 0;
+    const quantity = parseInt(item.quantity) || 0;
+    return total + price * quantity;
+  }, 0).toFixed(2);
 }
+
 
 /**
  * Calculates the shipping cost for the order.
@@ -21,10 +26,11 @@ function calculateShipping() {
  * @returns {string} The total cost of the order, formatted as a string with two decimal places.
  */
 function calculateTotal(cartItems) {
-  const subtotal = calculateSubtotal(cartItems);
+  const subtotal = parseFloat(calculateSubtotal(cartItems)) || 0;
   const shipping = calculateShipping();
-  return (parseFloat(subtotal) + shipping).toFixed(2);
+  return (subtotal + shipping).toFixed(2);
 }
+
 const express = require('express');
 const nodemailer = require('nodemailer');
 const bodyParser = require('body-parser');
@@ -50,8 +56,13 @@ const transporter = nodemailer.createTransport({
   }
 });
 function calculateSubtotal(cartItems) {
-  return cartItems.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2);
+  return cartItems.reduce((total, item) => {
+    const price = parseFloat(item.price ?? item.discountedPrice) || 0;
+    const quantity = parseInt(item.quantity) || 0;
+    return total + price * quantity;
+  }, 0).toFixed(2);
 }
+
 
 function calculateShipping() {
   return 300.00;
@@ -69,10 +80,11 @@ app.post('/send-email', (req, res) => {
 
   const cartItemsHtml = cartItems.map(item => `
   <tr>
-    <td>${item.name}</td>
-    <td>${item.quantity}</td>
-    <td>${item.price}</td>
-    <td>${item.quantity * item.price}</td>
+  <td>${item.name || item.title || 'Unnamed Item'}</td>
+  <td>${item.quantity || 0}</td>
+  <td>${item.price ?? item.discountedPrice ?? 0}</td>
+  <td>${((item.quantity || 0) * (item.price ?? item.discountedPrice ?? 0)).toFixed(2)}</td>
+  
     </tr>
 `).join('');
 
@@ -135,10 +147,10 @@ app.post('/send-admin-email', (req, res) => {
 
   const cartItemsHtml = cartItems.map(item => `
   <tr>
-    <td>${item.name || item.title}</td>
-    <td>${item.quantity}</td>
-    <td>${item.price ?? item.discountedPrice}</td>
-    <td>${item.quantity * (item.price ?? item.discountedPrice)}</td>
+    <td>${item.name || item.title || 'Unnamed Item'}</td>
+    <td>${item.quantity || 0}</td>
+    <td>${item.price ?? item.discountedPrice ?? 0}</td>
+    <td>${((item.quantity || 0) * (item.price ?? item.discountedPrice ?? 0)).toFixed(2)}</td>
   </tr>
 `).join('');
 
