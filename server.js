@@ -154,7 +154,6 @@ app.post('/send-admin-email', (req, res) => {
   </tr>
 `).join('');
 
-console.log(cartItems);
 
   fs.readFile(path.join(__dirname, 'admin_email_template.html'), 'utf8', (err, data) => {
     if (err) {
