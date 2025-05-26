@@ -135,12 +135,13 @@ app.post('/send-admin-email', (req, res) => {
 
   const cartItemsHtml = cartItems.map(item => `
   <tr>
-    <td>${item.name}</td>
+    <td>${item.name || item.title}</td>
     <td>${item.quantity}</td>
-    <td>${item.price}</td>
-    <td>${item.quantity * item.price}</td>
+    <td>${item.price ?? item.discountedPrice}</td>
+    <td>${item.quantity * (item.price ?? item.discountedPrice)}</td>
   </tr>
 `).join('');
+
 console.log(cartItems);
 
   fs.readFile(path.join(__dirname, 'admin_email_template.html'), 'utf8', (err, data) => {
