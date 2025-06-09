@@ -4,7 +4,6 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
-const jwt = require('jsonwebtoken');
 const mysql = require('mysql2/promise');
 
 const app = express();
@@ -56,35 +55,10 @@ function calculateTotal(cartItems) {
   return (subtotal + shipping).toFixed(2);
 }
 
-// JWT Middleware to authenticate token
-function authenticateToken(req, res, next) {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1]; // Bearer <token>
 
-  if (!token) return res.status(401).json({ message: 'Token required' });
-
-  jwt.verify(token, SECRET_KEY, (err, user) => {
-    if (err) return res.status(403).json({ message: 'Invalid or expired token' });
-    req.user = user;
-    next();
-  });
-}
-
-// Login route: simple mock user validation & JWT generation
-app.post('/login', (req, res) => {
-  const { username, password } = req.body;
-
-  // TODO: Replace this mock check with real DB user validation
-  if (username === 'admin' && password === 'password123') {
-    const token = jwt.sign({ username }, SECRET_KEY, { expiresIn: '1h' });
-    return res.json({ token });
-  }
-
-  res.status(401).json({ message: 'Invalid credentials' });
-});
 
 // Protected route: get products by category (requires JWT)
-app.get('/api/products/:category', authenticateToken, async (req, res) => {
+app.get('/api/products/:category', async (req, res) => {
   const { category } = req.params;
   try {
     const [rows] = await db.query('SELECT * FROM products WHERE category = ?', [category]);
@@ -95,7 +69,8 @@ app.get('/api/products/:category', authenticateToken, async (req, res) => {
   }
 });
 
-app.post('/api/products', authenticateToken, async (req, res) => {
+
+app.post('/api/products', async (req, res) => {
   const { category, title, imageUrl, originalPrice, discountedPrice, discountPercent, quantity } = req.body;
   try {
     const [result] = await db.query(
