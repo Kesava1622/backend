@@ -95,7 +95,6 @@ app.get('/api/products/:category', authenticateToken, async (req, res) => {
   }
 });
 
-// Add product route (protected)
 app.post('/api/products', authenticateToken, async (req, res) => {
   const { category, title, imageUrl, originalPrice, discountedPrice, discountPercent, quantity } = req.body;
   try {
