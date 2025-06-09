@@ -74,6 +74,15 @@ function calculateTotal(cartItems) {
   return (parseFloat(subtotal) + shipping).toFixed(2);
 }
 
+const mysql = require('mysql2/promise');
+
+const db = mysql.createPool({
+  host: 'srv1675.hstgr.io',    // e.g., 'srv123.main-hosting.eu'
+  user: 'u466412800_deepamcrackers',                 // e.g., 'u123456789_user'
+  password: 'Kesava@1622',
+  database: 'u466412800_crackers',             // e.g., 'u123456789_crackers'
+});
+
 
 app.post('/send-email', (req, res) => {
   const { username, email, mobile, state, city, addressLine1, addressLine2, cartItems, pincode, ordernumber } = req.body;
@@ -94,6 +103,42 @@ app.post('/send-email', (req, res) => {
       res.status(500).json({ message: 'Error reading email template', error: err.message });
       return;
     }
+
+    app.get('/api/products/:category', async (req, res) => {
+      const { category } = req.params;
+    
+      try {
+        const [rows] = await db.query('SELECT * FROM products WHERE category = ?', [category]);
+        res.json(rows);
+      } catch (err) {
+        console.error('Error fetching products:', err);
+        res.status(500).json({ message: 'Database error', error: err.message });
+      }
+    });
+    app.post('/api/products', async (req, res) => {
+      const { category, title, imageUrl, originalPrice, discountedPrice, discountPercent, quantity } = req.body;
+    
+      try {
+        const [result] = await db.query(`
+          INSERT INTO products (category, title, imageUrl, originalPrice, discountedPrice, discountPercent, quantity)
+          VALUES (?, ?, ?, ?, ?, ?, ?)
+        `, [category, title, imageUrl, originalPrice, discountedPrice, discountPercent, quantity]);
+    
+        res.json({ message: 'Product added', productId: result.insertId });
+      } catch (err) {
+        console.error('Error adding product:', err);
+        res.status(500).json({ message: 'Error adding product', error: err.message });
+      }
+    });
+    app.get('/api/test-db', async (req, res) => {
+      try {
+        const [rows] = await db.query('SELECT 1 + 1 AS result');
+        res.json({ success: true, result: rows[0].result });
+      } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+      }
+    });
+            
 
     const htmlContent = data
       .replaceAll('{{username}}', username)
