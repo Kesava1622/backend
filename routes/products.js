@@ -21,8 +21,10 @@ router.post('/', async (req, res) => {
       'INSERT INTO products (title, discountedPrice, discountPercent, image, category) VALUES (?, ?, ?, ?, ?)',
       [title, discountedPrice, discountPercent, image, category]
     );
-    res.json({ success: true });
+    console.log(db.query);
+    res.json({ success: true , insertId: result.insertId  });
   } catch (err) {
+    console.error('Insert failed:', error); 
     res.status(500).json({ error: 'Insert failed' });
   }
 });
