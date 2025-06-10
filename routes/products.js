@@ -1,17 +1,21 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
+const cors = require('cors');
+app.use(cors());
+
 
 // Get all products by category
-router.get('/', async (req, res) => {
-  const { category } = req.params;
-  try {
-    const [rows] = await db.query('SELECT * FROM products');
-    res.json(rows);
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch products' });
-  }
-});
+app.get('/api/products', async (req, res) => {
+    try {
+      const [rows] = await db.query('SELECT * FROM products');
+      res.json(rows);
+    } catch (error) {
+      console.error('DB Query error:', error);
+      res.status(500).json({ message: 'Internal Server Error' });
+    }
+  });
+  
 
 // Add a product
 router.post('/', async (req, res) => {
