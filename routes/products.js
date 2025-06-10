@@ -24,7 +24,7 @@ router.post('/', async (req, res) => {
       console.log(db.query); // ← this is incorrect
       res.json({ success: true , insertId: result.insertId  }); // ← `result` is not defined
     } catch (err) {
-      console.error('Insert failed:', error); // ← `error` is not defined
+      console.error('Insert failed:', err); // ← `error` is not defined
       res.status(500).json({ error: 'Insert failed' });
     }
   });
