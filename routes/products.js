@@ -24,8 +24,18 @@ router.post('/', async (req, res) => {
       console.log(db.query); // ← this is incorrect
       res.json({ success: true , insertId: result.insertId  }); // ← `result` is not defined
     } catch (err) {
-      console.error('Insert failed:', err); // ← `error` is not defined
+      console.error('Insert failed:', err.message,err.stack); // ← `error` is not defined
       res.status(500).json({ error: 'Insert failed' });
+    }
+  });
+  
+  router.get('/test-db', async (req, res) => {
+    try {
+      const [rows] = await db.query('SELECT 1');
+      res.json({ status: 'DB connected', result: rows });
+    } catch (err) {
+      console.error('DB connection failed:', err.message);
+      res.status(500).json({ error: 'DB connection failed' });
     }
   });
   
