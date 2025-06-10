@@ -3,10 +3,10 @@ const router = express.Router();
 const db = require('../db');
 
 // Get all products by category
-router.get('/:category', async (req, res) => {
+router.get('/', async (req, res) => {
   const { category } = req.params;
   try {
-    const [rows] = await db.query('SELECT * FROM products WHERE category = ?', [category]);
+    const [rows] = await db.query('SELECT * FROM products');
     res.json(rows);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch products' });
