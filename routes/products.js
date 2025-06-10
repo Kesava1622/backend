@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db');
 const app= require('cors');
+app.use(cors());
 
 
 // Get all products by category
