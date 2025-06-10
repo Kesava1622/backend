@@ -45,9 +45,6 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 app.use('/api/products', productRoutes);
-const router = express.Router();
-const db = require('../db');
-
 
 
 const transporter = nodemailer.createTransport({
