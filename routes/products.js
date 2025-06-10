@@ -1,12 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
-const app= require('cors');
-app.use(cors());
 
 
 // Get all products by category
-app.get('/', async (req, res) => {
+router.get('/', async (req, res) => {
   const { category } = req.params;
   try {
     const [rows] = await db.query('SELECT * FROM products');
