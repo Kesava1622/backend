@@ -211,7 +211,7 @@ app.post('/send-admin-email', (req, res) => {
   });
 });
 // Get all products by category
-app.get('/', async (req, res) => {
+app.get('/getproduct', async (req, res) => {
   const { category } = req.params;
   try {
     const [rows] = await db.query('SELECT * FROM products');
@@ -222,7 +222,7 @@ app.get('/', async (req, res) => {
 });
 
 // Add a product
-app.post('/', async (req, res) => {
+app.post('/addproduct', async (req, res) => {
     const { title, discountedPrice, discountPercent, image, category } = req.body;
     try {
       const [result] = await db.query(
@@ -250,7 +250,7 @@ app.post('/', async (req, res) => {
   
 
 // Update product
-app.put('/:id', async (req, res) => {
+app.put('/update/:id', async (req, res) => {
   const { id } = req.params;
   const { title, discountedPrice, discountPercent, image } = req.body;
   try {
@@ -265,7 +265,7 @@ app.put('/:id', async (req, res) => {
 });
 
 // Delete product
-app.delete('/:id', async (req, res) => {
+app.delete('/delete/:id', async (req, res) => {
   try {
     await db.query('DELETE FROM products WHERE id=?', [req.params.id]);
     res.json({ success: true });
