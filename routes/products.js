@@ -15,19 +15,20 @@ router.get('/:category', async (req, res) => {
 
 // Add a product
 router.post('/', async (req, res) => {
-  const { title, discountedPrice, discountPercent, image, category } = req.body;
-  try {
-    await db.query(
-      'INSERT INTO products (title, discountedPrice, discountPercent, image, category) VALUES (?, ?, ?, ?, ?)',
-      [title, discountedPrice, discountPercent, image, category]
-    );
-    console.log(db.query);
-    res.json({ success: true , insertId: result.insertId  });
-  } catch (err) {
-    console.error('Insert failed:', error); 
-    res.status(500).json({ error: 'Insert failed' });
-  }
-});
+    const { title, discountedPrice, discountPercent, image, category } = req.body;
+    try {
+      await db.query(
+        'INSERT INTO products (title, discountedPrice, discountPercent, image, category) VALUES (?, ?, ?, ?, ?)',
+        [title, discountedPrice, discountPercent, image, category]
+      );
+      console.log(db.query); // ← this is incorrect
+      res.json({ success: true , insertId: result.insertId  }); // ← `result` is not defined
+    } catch (err) {
+      console.error('Insert failed:', error); // ← `error` is not defined
+      res.status(500).json({ error: 'Insert failed' });
+    }
+  });
+  
 
 // Update product
 router.put('/:id', async (req, res) => {
