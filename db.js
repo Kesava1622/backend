@@ -11,4 +11,22 @@ const db = mysql.createPool({
   connectTimeout: 10000
 });
 
+async function testConnection() {
+  let connection;
+  try {
+    connection = await pool.getConnection();
+    await connection.ping();
+    console.log('Successfully connected to the database');
+  } catch (err) {
+    console.error('Database connection failed:', err);
+    throw err;
+  } finally {
+    if (connection) connection.release();
+  }
+}
+
+// Call the test function when the application starts
+testConnection();
+
+
 module.exports = db;
