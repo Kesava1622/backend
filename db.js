@@ -1,32 +1,31 @@
 const mysql = require('mysql2/promise');
 
-const db = mysql.createPool({
-  host: 'srv1675.hstgr.io', // or your Hostinger MySQL host
-  user: 'u466412800_deepamcrackers',
-  password: 'Kesava@1622',
-  database: 'u466412800_crackers',
+// Connection pool with ENV variables
+const pool = mysql.createPool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  port: process.env.DB_PORT || 3306,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
-  connectTimeout: 10000
+  connectTimeout: 10000,
+  ssl: process.env.DB_CA_CERT ? { 
+    rejectUnauthorized: true,
+    ca: process.env.DB_CA_CERT 
+  } : false
 });
 
-async function testConnection() {
-  let connection;
-  try {
-    connection = await pool.getConnection();
-    await connection.ping();
-    console.log('Successfully connected to the database');
-  } catch (err) {
-    console.error('Database connection failed:', err);
-    throw err;
-  } finally {
-    if (connection) connection.release();
-  }
-}
+// Test connection
+pool.getConnection()
+  .then(conn => {
+    console.log('✅ Connected to MySQL database');
+    conn.release();
+  })
+  .catch(err => {
+    console.error('❌ Database connection failed:', err.message);
+    process.exit(1); // Fail fast if no DB connection
+  });
 
-// Call the test function when the application starts
-testConnection();
-
-
-module.exports = db;
+module.exports = pool;
