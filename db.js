@@ -20,29 +20,16 @@ const pool = mysql.createPool({
   connectionLimit: parseInt(process.env.DB_CONNECTION_LIMIT) || 10,
   queueLimit: parseInt(process.env.DB_QUEUE_LIMIT) || 0,
   connectTimeout: parseInt(process.env.DB_CONNECT_TIMEOUT) || 30000,
-  ssl: process.env.DB_SSL === 'false' ? { 
-    rejectUnauthorized: true,
+  ssl: process.env.DB_SSL === 'true' ? { 
+    rejectUnauthorized: false,
     ca: process.env.DB_CA_CERT?.replace(/\\n/g, '\n') // Fixes newline formatting
   } : false
 });
 
-pool.getConnection()
-  .then(conn => {
-    console.log('✅ MySQL Connection Successful');
-    // Use backticks for aliases in MariaDB
-    return conn.query('SELECT NOW() AS `server_time`')
-      .then(([rows]) => {
-        console.log('Database Server Time:', rows[0].server_time);
-        conn.release();
-      });
-  })
+pool.query('SELECT 1')
+  .then(() => console.log('✅ Connection verified'))
   .catch(err => {
-    console.error('❌ FATAL DB CONNECTION ERROR:', {
-      message: err.message,
-      code: err.code,
-      sql: err.sql,  // This will show the problematic query
-      fatal: true
-    });
+    console.error('❌ Connection failed:', err.message);
     process.exit(1);
   });
 module.exports = pool;
