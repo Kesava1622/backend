@@ -1,8 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../db');
+const { db, storage, ref, uploadBytes, getDownloadURL } = require('../db');
+const { collection, addDoc, getDocs, doc, getDoc, updateDoc, deleteDoc } = require("firebase/firestore");
+const multer = require('multer');
+const upload = multer({ storage: multer.memoryStorage() });
 
-// Middleware for error handling and logging
+// Middleware for error handling
 const asyncHandler = (fn) => (req, res, next) => {
   Promise.resolve(fn(req, res, next)).catch(next);
 };
@@ -10,88 +13,123 @@ const asyncHandler = (fn) => (req, res, next) => {
 // Get all products (with optional category filter)
 router.get('/products', asyncHandler(async (req, res) => {
   const { category } = req.query;
+  const productsRef = collection(db, 'products');
+  const snapshot = await getDocs(productsRef);
   
-  let query = 'SELECT * FROM products';
-  const params = [];
+  let products = [];
+  snapshot.forEach(doc => {
+    const product = doc.data();
+    if (!category || product.category === category) {
+      products.push({ id: doc.id, ...product });
+    }
+  });
   
-  if (category) {
-    query += ' WHERE category = ?';
-    params.push(category);
-  }
-  
-  const [products] = await db.query(query, params);
   res.json(products);
 }));
 
 // Get single product by ID
 router.get('/products/:id', asyncHandler(async (req, res) => {
-  const [product] = await db.query('SELECT * FROM products WHERE id = ?', [req.params.id]);
+  const productRef = doc(db, 'products', req.params.id);
+  const productSnap = await getDoc(productRef);
   
-  if (!product.length) {
+  if (!productSnap.exists()) {
     return res.status(404).json({ error: 'Product not found' });
   }
   
-  res.json(product[0]);
+  res.json({ id: productSnap.id, ...productSnap.data() });
 }));
 
-// Create new product
-router.post('/products', asyncHandler(async (req, res) => {
-  const { title, discountedPrice, discountPercent, image, category } = req.body;
+// Create new product (with image upload)
+router.post('/products', upload.single('image'), asyncHandler(async (req, res) => {
+  const { title, discountedPrice, discountPercent, category } = req.body;
   
-  // Basic validation
   if (!title || !discountedPrice || !category) {
     return res.status(400).json({ error: 'Title, price and category are required' });
   }
 
-  const [result] = await db.query(
-    'INSERT INTO products (title, discountedPrice, discountPercent, image, category) VALUES (?, ?, ?, ?, ?)',
-    [title, discountedPrice, discountPercent || null, image || null, category]
-  );
+  let imageUrl = null;
+  if (req.file) {
+    const storageRef = ref(storage, `products/${Date.now()}_${req.file.originalname}`);
+    await uploadBytes(storageRef, req.file.buffer);
+    imageUrl = await getDownloadURL(storageRef);
+  }
 
-  // Return the newly created product
-  const [newProduct] = await db.query('SELECT * FROM products WHERE id = ?', [result.insertId]);
-  res.status(201).json(newProduct[0]);
+  const productData = {
+    title,
+    discountedPrice: parseFloat(discountedPrice),
+    discountPercent: discountPercent ? parseFloat(discountPercent) : null,
+    image: imageUrl,
+    category,
+    createdAt: new Date().toISOString()
+  };
+
+  const docRef = await addDoc(collection(db, 'products'), productData);
+  const newProduct = await getDoc(docRef);
+  
+  res.status(201).json({ id: docRef.id, ...newProduct.data() });
 }));
 
-// Update product
-router.put('/products/:id', asyncHandler(async (req, res) => {
+// Update product (with optional image update)
+router.put('/products/:id', upload.single('image'), asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { title, discountedPrice, discountPercent, image, category } = req.body;
-
-  // Check if product exists
-  const [existing] = await db.query('SELECT * FROM products WHERE id = ?', [id]);
-  if (!existing.length) {
+  const { title, discountedPrice, discountPercent, category } = req.body;
+  const productRef = doc(db, 'products', id);
+  const productSnap = await getDoc(productRef);
+  
+  if (!productSnap.exists()) {
     return res.status(404).json({ error: 'Product not found' });
   }
 
-  await db.query(
-    'UPDATE products SET title=?, discountedPrice=?, discountPercent=?, image=?, category=? WHERE id=?',
-    [title, discountedPrice, discountPercent || null, image || null, category, id]
-  );
+  let imageUrl = productSnap.data().image;
+  if (req.file) {
+    // Upload new image
+    const storageRef = ref(storage, `products/${Date.now()}_${req.file.originalname}`);
+    await uploadBytes(storageRef, req.file.buffer);
+    imageUrl = await getDownloadURL(storageRef);
+    
+    // TODO: Optionally delete old image from storage
+  }
 
-  // Return the updated product
-  const [updatedProduct] = await db.query('SELECT * FROM products WHERE id = ?', [id]);
-  res.json(updatedProduct[0]);
+  const updateData = {
+    title,
+    discountedPrice: parseFloat(discountedPrice),
+    discountPercent: discountPercent ? parseFloat(discountPercent) : null,
+    image: imageUrl,
+    category,
+    updatedAt: new Date().toISOString()
+  };
+
+  await updateDoc(productRef, updateData);
+  const updatedProduct = await getDoc(productRef);
+  
+  res.json({ id: updatedProduct.id, ...updatedProduct.data() });
 }));
 
 // Delete product
 router.delete('/products/:id', asyncHandler(async (req, res) => {
   const { id } = req.params;
-
-  // Check if product exists
-  const [existing] = await db.query('SELECT * FROM products WHERE id = ?', [id]);
-  if (!existing.length) {
+  const productRef = doc(db, 'products', id);
+  const productSnap = await getDoc(productRef);
+  
+  if (!productSnap.exists()) {
     return res.status(404).json({ error: 'Product not found' });
   }
 
-  await db.query('DELETE FROM products WHERE id=?', [id]);
+  // TODO: Optionally delete associated image from storage
+  await deleteDoc(productRef);
+  
   res.json({ success: true, message: 'Product deleted successfully' });
 }));
 
 // Database connection test endpoint
 router.get('/test-db', asyncHandler(async (req, res) => {
-  const [rows] = await db.query('SELECT 1');
-  res.json({ status: 'DB connected', result: rows });
+  try {
+    const productsRef = collection(db, 'products');
+    await getDocs(productsRef);
+    res.json({ status: 'Firebase connected' });
+  } catch (err) {
+    throw new Error('Firebase connection failed');
+  }
 }));
 
 // Error handling middleware

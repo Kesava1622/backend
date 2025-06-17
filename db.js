@@ -1,41 +1,127 @@
-require('dotenv').config(); // ← MUST be at the very top
-const mysql = require('mysql2/promise');
+require('dotenv').config();
+const { initializeApp } = require("firebase/app");
+const { getFirestore, collection, getDocs, doc, addDoc, updateDoc, deleteDoc } = require("firebase/firestore");
 
 // Debug: Log the environment variables being used
-console.log('DB Connection Config:', {
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  database: process.env.DB_NAME,
-  port: process.env.DB_PORT,
-  ssl: !!process.env.DB_CA_CERT // Shows if SSL is enabled
+console.log('Firebase Configuration:', {
+  projectId: process.env.FIREBASE_PROJECT_ID,
 });
 
-const pool = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  port: process.env.DB_PORT,
-  waitForConnections: true,
-  connectionLimit: parseInt(process.env.DB_CONNECTION_LIMIT) || 1000,
-  queueLimit: parseInt(process.env.DB_QUEUE_LIMIT) || 0,
-  connectTimeout: parseInt(process.env.DB_CONNECT_TIMEOUT) || 30000,
-  ssl: process.env.DB_SSL === 'true' ? { 
-    rejectUnauthorized: true,
-    ca: process.env.DB_CA_CERT?.replace(/\\n/g, '\n') // Fixes newline formatting
-  } : false
-});
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: process.env.FIREBASE_API_KEY,
+  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.FIREBASE_PROJECT_ID,
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.FIREBASE_APP_ID,
+  measurementId: process.env.FIREBASE_MEASUREMENT_ID,
+};
 
-pool.query('SELECT 1')
-  .then(() => console.log('✅ Connection verified'))
-  .catch(err => {
-    console.log('Actual ENV values:', {
-      host: process.env.DB_HOST,
-      user: process.env.DB_USER,
-      pass: process.env.DB_PASSWORD ? '***********' : 'MISSING',
-      db: process.env.DB_NAME
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// Test connection to Firestore
+const testFirebaseConnection = async () => {
+  try {
+    const productsRef = collection(db, "products");
+    await getDocs(productsRef);
+    console.log('✅ Successfully connected to Firebase Firestore');
+    return true;
+  } catch (err) {
+    console.error('❌ Firebase connection failed:', err.message);
+    console.log('Current environment configuration:', {
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      apiKey: process.env.FIREBASE_API_KEY ? '***********' : 'MISSING'
     });
-    console.error('❌ Connection failed:', err.message);
     process.exit(1);
-  });
-module.exports = pool;
+  }
+};
+
+// Product CRUD Operations
+const productOperations = {
+  /**
+   * Get all products from Firestore
+   * @returns {Promise<Array>} Array of product objects
+   */
+  getAllProducts: async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "products"));
+      return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    } catch (error) {
+      console.error("Error getting products:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * Add a new product to Firestore
+   * @param {Object} productData - Product data to add
+   * @returns {Promise<string>} ID of the newly created product
+   */
+  addProduct: async (productData) => {
+    try {
+      const docRef = await addDoc(collection(db, "products"), productData);
+      return docRef.id;
+    } catch (error) {
+      console.error("Error adding product:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * Update an existing product in Firestore
+   * @param {string} productId - ID of the product to update
+   * @param {Object} updateData - Data to update
+   */
+  updateProduct: async (productId, updateData) => {
+    try {
+      const productRef = doc(db, "products", productId);
+      await updateDoc(productRef, updateData);
+    } catch (error) {
+      console.error("Error updating product:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * Delete a product from Firestore
+   * @param {string} productId - ID of the product to delete
+   */
+  deleteProduct: async (productId) => {
+    try {
+      const productRef = doc(db, "products", productId);
+      await deleteDoc(productRef);
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * Get a single product by ID
+   * @param {string} productId - ID of the product to retrieve
+   * @returns {Promise<Object|null>} Product data or null if not found
+   */
+  getProductById: async (productId) => {
+    try {
+      const productRef = doc(db, "products", productId);
+      const productSnap = await getDoc(productRef);
+      return productSnap.exists() ? { id: productSnap.id, ...productSnap.data() } : null;
+    } catch (error) {
+      console.error("Error getting product:", error);
+      throw error;
+    }
+  }
+};
+
+// Initialize and verify connection
+(async () => {
+  await testFirebaseConnection();
+})();
+
+module.exports = {
+  db,
+  ...productOperations
+};
