@@ -19,8 +19,8 @@ const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: parseInt(process.env.DB_CONNECTION_LIMIT) || 10,
   queueLimit: parseInt(process.env.DB_QUEUE_LIMIT) || 0,
-  connectTimeout: parseInt(process.env.DB_CONNECT_TIMEOUT) || 10000,
-  ssl: process.env.DB_SSL === 'true' ? { 
+  connectTimeout: parseInt(process.env.DB_CONNECT_TIMEOUT) || 30000,
+  ssl: process.env.DB_SSL === 'false' ? { 
     rejectUnauthorized: true,
     ca: process.env.DB_CA_CERT?.replace(/\\n/g, '\n') // Fixes newline formatting
   } : false
