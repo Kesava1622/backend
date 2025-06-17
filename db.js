@@ -32,7 +32,7 @@ pool.query('SELECT 1')
     console.log('Actual ENV values:', {
       host: process.env.DB_HOST,
       user: process.env.DB_USER,
-      pass: process.env.DB_PASSWORD ? DB_PASSWORD : 'MISSING',
+      pass: process.env.DB_PASSWORD ? '***********' : 'MISSING',
       db: process.env.DB_NAME
     });
     console.error('❌ Connection failed:', err.message);
