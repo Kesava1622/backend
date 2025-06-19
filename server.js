@@ -7,9 +7,10 @@ const path = require('path');
 const productRoutes = require('./routes/products');
 
 const app = express();
-app.use(bodyParser.json());
 app.use(cors());
 app.use('/api/products', productRoutes);
+app.use(bodyParser.json({ limit: '10mb' })); // Allow JSON payloads up to 10MB
+app.use(bodyParser.urlencoded({ limit: '10mb', extended: true })); // For URL-encoded forms
 
 // Email transporter configuration
 const transporter = nodemailer.createTransport({
@@ -118,6 +119,7 @@ app.post('/send-order-emails', async (req, res) => {
       customerEmail: customerResult.response,
       adminEmail: adminResult.response
     });
+    console.log('Payload size:', JSON.stringify(orderData).length / 1024 / 1024, 'MB');
 
   } catch (error) {
     console.error('Error sending emails:', error);
