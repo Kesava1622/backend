@@ -1,31 +1,17 @@
-// server.js
 const express = require('express');
 const nodemailer = require('nodemailer');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
-const PDFDocument = require('pdfkit');
 const productRoutes = require('./routes/products');
 
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 app.use('/api/products', productRoutes);
-const router = express.Router();
-const db = require('../db');
 
-// Simulated database (replace with actual DB logic)
-const orders = {}; // key: orderNumber, value: orderData
-
-function saveOrder(orderData) {
-  orders[orderData.ordernumber] = { ...orderData, createdAt: new Date() };
-}
-
-function getOrderByNumber(orderNumber) {
-  return orders[orderNumber];
-}
-
+// Email transporter configuration
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
   port: 465,
@@ -39,117 +25,121 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-function calculateSubtotal(cartItems = []) {
-  return cartItems.reduce((tot, item) =>
-    tot + (parseFloat(item.price ?? item.discountedPrice) || 0) *
-          (parseInt(item.quantity) || 0), 0
-  ).toFixed(2);
+// Utility functions
+function calculateSubtotal(cartItems) {
+  return cartItems.reduce((total, item) => {
+    const price = parseFloat(item.price ?? item.discountedPrice) || 0;
+    const quantity = parseInt(item.quantity) || 0;
+    return total + price * quantity;
+  }, 0).toFixed(2);
 }
 
-function calculateTotal(cartItems = []) {
-  return (+calculateSubtotal(cartItems)).toFixed(2);
+function calculateShipping() {
+  return 300.00;
 }
 
-app.post('/send-email', async (req, res) => {
+function calculateTotal(cartItems) {
+  const subtotal = calculateSubtotal(cartItems);
+  const shipping = calculateShipping();
+  return (parseFloat(subtotal) + shipping).toFixed(2);
+}
+
+function generateCartItemsHTML(cartItems) {
+  return cartItems.map(item => `
+    <tr>
+      <td>${item.name || item.title || 'Unnamed Item'}</td>
+      <td>${item.quantity || 0}</td>
+      <td>${item.price ?? item.discountedPrice ?? 0}</td>
+      <td>${((item.quantity || 0) * (item.price ?? item.discountedPrice ?? 0)).toFixed(2)}</td>
+    </tr>
+  `).join('');
+}
+
+function replaceTemplatePlaceholders(template, orderData, cartItemsHtml) {
+  return template
+    .replaceAll('{{username}}', orderData.username)
+    .replaceAll('{{cartItems}}', cartItemsHtml)
+    .replaceAll('{{orderSubtotal}}', calculateSubtotal(orderData.cartItems))
+    .replaceAll('{{orderShipping}}', calculateShipping())
+    .replaceAll('{{addressLine1}}', orderData.addressLine1)
+    .replaceAll('{{addressLine2}}', orderData.addressLine2)
+    .replaceAll('{{state}}', orderData.state)
+    .replaceAll('{{city}}', orderData.city)
+    .replaceAll('{{mobile}}', orderData.mobile)
+    .replaceAll('{{email}}', orderData.email)
+    .replaceAll('{{pincode}}', orderData.pincode)
+    .replaceAll('{{ordernumber}}', orderData.ordernumber)
+    .replaceAll('{{orderTotal}}', calculateTotal(orderData.cartItems));
+}
+
+// Combined email endpoint
+app.post('/send-order-emails', async (req, res) => {
   try {
-    const order = req.body;
-    const html = `<p>Hi ${order.username}, your order has been placed successfully.</p>`;
-    const mailOptions = {
+    const orderData = req.body;
+    const cartItemsHtml = generateCartItemsHTML(orderData.cartItems);
+
+    // Read both templates simultaneously
+    const [customerTemplate, adminTemplate] = await Promise.all([
+      fs.promises.readFile(path.join(__dirname, 'email_template.html'), 'utf8'),
+      fs.promises.readFile(path.join(__dirname, 'admin_email_template.html'), 'utf8')
+    ]);
+
+    // Prepare both email contents
+    const customerHtml = replaceTemplatePlaceholders(customerTemplate, orderData, cartItemsHtml);
+    const adminHtml = replaceTemplatePlaceholders(adminTemplate, orderData, cartItemsHtml);
+
+    // Create both email options
+    const customerMailOptions = {
       from: 'deepamcrackerssvks@gmail.com',
-      to: order.email,
-      subject: 'Order Confirmation - Deepam Crackers',
-      html,
-      attachments: [
-        {
-          filename: 'logo.png',
-          path: path.join(__dirname, 'assets/logo.png'),
-          cid: 'logo'
-        }
-      ]
+      to: orderData.email,
+      subject: 'Your Deepam Crackers order has been received',
+      html: customerHtml,
+      attachments: [{
+        filename: 'logo.png',
+        path: path.join(__dirname, 'assets/logo.png'),
+        cid: 'logo'
+      }]
     };
 
-    await transporter.sendMail(mailOptions);
-    saveOrder(order);
-    res.status(200).json({ message: 'Email sent' });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Error sending email', error: err.message });
-  }
-});
-
-app.post('/send-admin-email', async (req, res) => {
-  try {
-    const order = req.body;
-    const html = `<p>New order received: ${order.ordernumber}</p>`;
-    const mailOptions = {
+    const adminMailOptions = {
       from: 'deepamcrackerssvks@gmail.com',
       to: 'deepamcrackerssvks@gmail.com',
-      subject: 'New Order - Deepam Crackers',
-      html,
-      attachments: [
-        {
-          filename: 'logo.png',
-          path: path.join(__dirname, 'assets/logo.png'),
-          cid: 'logo'
-        }
-      ]
+      subject: 'New Order Received - Deepam Crackers',
+      html: adminHtml,
+      attachments: [{
+        filename: 'logo.png',
+        path: path.join(__dirname, 'assets/logo.png'),
+        cid: 'logo'
+      }]
     };
 
-    await transporter.sendMail(mailOptions);
-    res.status(200).json({ message: 'Admin email sent' });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Error sending admin email', error: err.message });
-  }
-});
+    // Send both emails in parallel
+    const [customerResult, adminResult] = await Promise.all([
+      transporter.sendMail(customerMailOptions),
+      transporter.sendMail(adminMailOptions)
+    ]);
 
-app.get('/api/download-pdf/:orderNumber', async (req, res) => {
-  try {
-    const { orderNumber } = req.params;
-    const order = getOrderByNumber(orderNumber);
+    console.log('Customer email sent:', customerResult.response);
+    console.log('Admin email sent:', adminResult.response);
 
-    if (!order) return res.status(404).send('Order not found');
-
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader(
-      'Content-Disposition',
-      `attachment; filename=order_${orderNumber}.pdf`
-    );
-
-    const doc = new PDFDocument();
-    doc.pipe(res);
-
-    doc.fontSize(20).text('Deepam Crackers', { align: 'center' });
-    doc.moveDown();
-    doc.fontSize(14).text(`Order Confirmation`, { align: 'center' });
-    doc.moveDown();
-
-    doc.fontSize(12).text(`Order No: ${orderNumber}`);
-    doc.text(`Date: ${new Date(order.createdAt).toLocaleDateString()}`);
-    doc.moveDown();
-
-    doc.text(`Name: ${order.username}`);
-    doc.text(`Email: ${order.email}`);
-    doc.text(`Mobile: ${order.mobile}`);
-    doc.text(`Address: ${order.addressLine1}, ${order.addressLine2}, ${order.city}, ${order.state} - ${order.pincode}`);
-    doc.moveDown();
-
-    doc.text('Items:', { underline: true });
-    order.cartItems.forEach((item, i) => {
-      const price = item.price ?? item.discountedPrice;
-      doc.text(`${i + 1}. ${item.name} - Qty: ${item.quantity} - ₹${price * item.quantity}`);
+    res.status(200).json({ 
+      success: true,
+      message: 'Both emails sent successfully',
+      customerEmail: customerResult.response,
+      adminEmail: adminResult.response
     });
 
-    doc.moveDown();
-    doc.text(`Subtotal: ₹${calculateSubtotal(order.cartItems)}`);
-    doc.text(`Total: ₹${calculateTotal(order.cartItems)}`, { underline: true });
-
-    doc.end();
-  } catch (err) {
-    console.error('PDF generation error:', err);
-    res.status(500).send('Failed to generate PDF');
+  } catch (error) {
+    console.error('Error sending emails:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Error sending one or both emails',
+      error: error.message 
+    });
   }
 });
 
 const PORT = 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
