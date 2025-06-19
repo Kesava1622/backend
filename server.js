@@ -89,11 +89,6 @@ app.post('/send-order-emails', async (req, res) => {
       to: orderData.email,
       subject: 'Your Deepam Crackers order has been received',
       html: customerHtml,
-      attachments: [{
-        filename: 'logo.png',
-        path: path.join(__dirname, 'assets/logo.png'),
-        cid: 'logo'
-      }]
     };
 
     const adminMailOptions = {
