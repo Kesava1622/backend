@@ -34,14 +34,10 @@ function calculateSubtotal(cartItems) {
   }, 0).toFixed(2);
 }
 
-function calculateShipping() {
-  return 300.00;
-}
 
 function calculateTotal(cartItems) {
   const subtotal = calculateSubtotal(cartItems);
-  const shipping = calculateShipping();
-  return (parseFloat(subtotal) + shipping).toFixed(2);
+  return (parseFloat(subtotal)).toFixed(2);
 }
 
 function generateCartItemsHTML(cartItems) {
@@ -60,7 +56,6 @@ function replaceTemplatePlaceholders(template, orderData, cartItemsHtml) {
     .replaceAll('{{username}}', orderData.username)
     .replaceAll('{{cartItems}}', cartItemsHtml)
     .replaceAll('{{orderSubtotal}}', calculateSubtotal(orderData.cartItems))
-    .replaceAll('{{orderShipping}}', calculateShipping())
     .replaceAll('{{addressLine1}}', orderData.addressLine1)
     .replaceAll('{{addressLine2}}', orderData.addressLine2)
     .replaceAll('{{state}}', orderData.state)

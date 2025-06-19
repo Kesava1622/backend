@@ -1,190 +1,301 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Email Template</title>
+    <title>Your Order Confirmation</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+        
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
+            font-family: 'Poppins', Arial, sans-serif;
+            background-color: #f8fafc;
             margin: 0;
             padding: 0;
+            color: #334155;
+            line-height: 1.6;
         }
 
         .container {
             max-width: 600px;
             margin: 20px auto;
-            padding: 20px;
+            padding: 0;
             background-color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         }
 
         .header {
+            background: linear-gradient(135deg, #f97316, #ea580c);
+            padding: 30px 20px;
             text-align: center;
-            border-bottom: 2px solid #f0f0f0;
-            padding-bottom: 10px;
+            color: white;
         }
 
         .header img {
-            max-width: 150px;
-            pointer-events: none; /* Disables interaction */
-            user-select: none; /* Disables text selection */
-            -webkit-user-drag: none; /* Disables dragging in webkit browsers */
+            max-width: 180px;
+            height: auto;
+            pointer-events: none;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        .header h1 {
+            margin: 15px 0 0;
+            font-size: 24px;
+            font-weight: 600;
         }
 
         .content {
-            margin: 20px 0;
+            padding: 30px;
         }
 
-        .content h2 {
-            color: #333;
+        .order-status {
+            background-color: #ffedd5;
+            color: #9a3412;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 25px;
+            font-weight: 500;
         }
 
-        .cart-details {
+        .thank-you {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 20px;
+        }
+
+        .order-number {
+            background-color: #f1f5f9;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 500;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+            margin: 25px 0 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .payment-info {
+            background-color: #f0fdf4;
+            border-left: 4px solid #16a34a;
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 25px;
+        }
+
+        .payment-info h3 {
+            margin-top: 0;
+            color: #166534;
+        }
+
+        .payment-info ul {
+            padding-left: 20px;
+            margin-bottom: 0;
+        }
+
+        .payment-info li {
+            margin-bottom: 5px;
+        }
+
+        .cart-table {
             width: 100%;
             border-collapse: collapse;
+            margin-bottom: 25px;
         }
 
-        .cart-details th,
-        .cart-details td {
-            border: 1px solid #ddd;
-            padding: 8px;
+        .cart-table th {
+            background-color: #f1f5f9;
+            padding: 12px;
             text-align: left;
+            font-weight: 500;
         }
 
-        .cart-details th {
-            background-color: #f4f4f4;
+        .cart-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: top;
+        }
+
+        .cart-table tfoot td {
+            font-weight: 500;
+            border-bottom: none;
+        }
+
+        .total-row {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .address-section {
+            display: flex;
+            gap: 20px;
+            margin-top: 25px;
+        }
+
+        .address-box {
+            flex: 1;
+            background-color: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .address-box h3 {
+            margin-top: 0;
+            font-size: 16px;
+            color: #1e293b;
+        }
+
+        .contact-info {
+            margin-top: 30px;
+            background-color: #f1f5f9;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
         }
 
         .footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 20px;
-            font-size: 0.9em;
-            color: #777;
-            padding: 10px 0;
-            border-top: 1px solid #f0f0f0;
-            max-width: 100%;
+            background-color: #1e293b;
+            color: #f8fafc;
+            padding: 25px;
+            text-align: center;
+            font-size: 14px;
         }
 
         .footer img {
-            max-width: 100px;
-            pointer-events: none; /* Disables interaction */
-            user-select: none; /* Disables text selection */
-            -webkit-user-drag: none; /* Disables dragging in webkit browsers */
-            margin-right: auto;
+            max-width: 120px;
+            margin-bottom: 15px;
+            pointer-events: none;
+            user-select: none;
+            -webkit-user-drag: none;
         }
 
         .footer p {
-            text-align: right;
-            flex-grow: 1;
-            margin-left: auto;
+            margin: 8px 0;
         }
 
-        .divider {
-            display: flex;
-            align-items: center;
-            text-align: center;
+        .social-links {
             margin: 20px 0;
         }
 
-        .divider::before,
-        .divider::after {
-            content: '';
-            flex: 1;
-            border-bottom: 1px solid #000;
+        .social-links a {
+            display: inline-block;
+            margin: 0 8px;
         }
 
-        .divider span {
-            padding: 0 10px;
+        .button {
+            display: inline-block;
+            background-color: #f97316;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 500;
+            margin-top: 15px;
         }
 
-        .address-columns {
-            display: flex;
-            justify-content: left;
-            margin-top: 5px;
-        }
-
-        .address-column {
-            width: 70%;
+        .divider {
+            height: 1px;
+            background-color: #e2e8f0;
+            margin: 25px 0;
         }
     </style>
 </head>
-
 <body>
     <div class="container">
         <div class="header">
-            <a href="https://your-website.com" target="_blank">
-                <img src="cid:logo" alt="Website Logo">
+            <a href="https://www.deepamcrackers.com" target="_blank">
             </a>
+            <h1>Order Confirmation</h1>
         </div>
-        <div class="content">
-            <h2>Thank you for your order, {{username}}!</h2>
-            <p>Your order is on-hold until we confirm payment has been received. Your order details are shown below for your reference:</p>
-            <h2>Our bank details</h2>
-            <h2>Account Name: FireFest Crackers</h2>
-            <ul>
-                <li>Bank: XYZ BANK</li>
-                <li>Account number: 123456789</li>
-                <li>IFSC: XYZ0006172</li>
-            </ul>
-            <div class="divider">
-                <span>ORDER DETAILS</span>
-            </div>
-            <h4>Order Number : {{ordernumber}}</h4>
 
-            <table class="cart-details">
+        <div class="content">
+            <div class="order-status">
+                Your order is on hold until we confirm payment
+            </div>
+
+            <div class="thank-you">
+                Thank you for your order, {{username}}!
+            </div>
+
+            <p>We've received your order and will begin processing it once payment is confirmed. Here are your order details:</p>
+
+            <div class="order-number">
+                Order #{{ordernumber}}
+            </div>
+
+            <div class="payment-info">
+                <h3>Payment Information</h3>
+                <p>Please complete your payment to the following account:</p>
+                <ul>
+                    <li><strong>GPAY :</strong> +91 9443327227</li>
+                    <li><strong>GPAY :</strong> +91 8220906944</li>
+                </ul>
+            </div>
+
+            <div class="section-title">Order Summary</div>
+
+            <table class="cart-table">
                 <thead>
                     <tr>
                         <th>Item</th>
-                        <th>Quantity</th>
+                        <th>Qty</th>
                         <th>Price</th>
                         <th>Total</th>
                     </tr>
                 </thead>
                 <tbody>
-                        {{cartItems}}
+                    {{cartItems}}
                 </tbody>
                 <tfoot>
                     <tr>
                         <td colspan="3" style="text-align: right;">Subtotal</td>
-                        <td>{{orderSubtotal}}</td>
+                        <td>₹{{orderSubtotal}}</td>
                     </tr>
-                    <tr>
-                        <td colspan="3" style="text-align: right;">Shipping</td>
-                        <td>{{orderShipping}}</td>
-                    </tr>
-                    <tr>
-                        <td colspan="3" style="text-align: right; font-weight: bold;">Total</td>
-                        <td style="font-weight: bold;">{{orderTotal}}</td>
+                    <tr class="total-row">
+                        <td colspan="3" style="text-align: right;">Total</td>
+                        <td>₹{{orderTotal}}</td>
                     </tr>
                 </tfoot>
             </table>
-            <h4>Alternative Mobile No: 1234567890</h4>
-            <div class="address-columns">
-                <div class="address-column">
-                    <h3>Billing Address:</h3>
+
+            <div class="address-section">
+                <div class="address-box">
+                    <h3>Billing Address</h3>
                     <p>{{addressLine1}}</p>
                     <p>{{addressLine2}}</p>
-                    <p>{{city}}, {{state}}, {{pincode}}</p>
-                    <p>{{mobile}}</p>
-                    <p>{{email}}</p>
+                    <p>{{city}}, {{state}} - {{pincode}}</p>
+                    <p>India</p>
+                    <p>Phone: {{mobile}}</p>
+                    <p>Email: {{email}}</p>
                 </div>
             </div>
+
+            <div class="contact-info">
+                <h3>Need Help?</h3>
+                <p>We're here to assist you with your order!</p>
+                <p>Email: deepamcrackerssvks@gmail.com</p>
+                <p>Phone: +91 82209 06944 | +91 94433 27227</p>
+                <a href="https://www.deepamcrackers.com/contactus" class="button">Contact Us</a>
+            </div>
         </div>
+
         <div class="footer">
-            <a href="https://your-website.com" target="_blank">
-                <img src="cid:logo" alt="">
+            <a href="https://www.deepamcrackers.com" target="_blank">
+             
             </a>
-            <p>
-                For any queries, mail us at<br> deepamcrackerssvks@gmail.com<br>
-                call us on +91 82209-06944, +91 94433-27227
-            </p>
+            <p>© 2023 Deepam Crackers. All Rights Reserved.</p>
         </div>
     </div>
 </body>
-
 </html>

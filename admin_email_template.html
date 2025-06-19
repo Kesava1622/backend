@@ -1,124 +1,293 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Order Notification</title>
+    <title>New Order Notification</title>
     <style>
-        /* Keep the existing styles, but you may want to adjust colors or add admin-specific styling */
-    </style>
-</head>
-<style>
-    body {
-            font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+        
+        body {
+            font-family: 'Poppins', Arial, sans-serif;
+            background-color: #f8fafc;
             margin: 0;
             padding: 0;
+            color: #334155;
+            line-height: 1.6;
         }
 
         .container {
-            max-width: 600px;
+            max-width: 650px;
             margin: 20px auto;
-            padding: 20px;
+            padding: 0;
             background-color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         }
+
+        .header {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            padding: 25px;
+            text-align: center;
+            color: white;
+        }
+
+        .header img {
+            max-width: 160px;
+            height: auto;
+            pointer-events: none;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        .header h1 {
+            margin: 15px 0 0;
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .alert-banner {
+            background-color: #fef3c7;
+            color: #92400e;
+            padding: 15px;
+            text-align: center;
+            font-weight: 500;
+            border-bottom: 1px solid #fde68a;
+        }
+
         .content {
+            padding: 30px;
+        }
+
+        .order-card {
+            background-color: #f1f5f9;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .order-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .order-number {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .order-date {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .priority-badge {
+            background-color: #dc2626;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-left: 10px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e293b;
+            margin: 20px 0 10px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .cart-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        .cart-table th {
+            background-color: #f1f5f9;
+            padding: 12px;
+            text-align: left;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .cart-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: top;
+            font-size: 14px;
+        }
+
+        .cart-table tfoot td {
+            font-weight: 500;
+            border-bottom: none;
+        }
+
+        .total-row {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .customer-details {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .detail-box {
+            flex: 1;
+            background-color: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .detail-box h3 {
+            margin-top: 0;
+            font-size: 15px;
+            color: #1e293b;
+        }
+
+        .payment-status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .action-buttons {
+            margin-top: 25px;
+            text-align: center;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 500;
+            margin: 0 5px;
+            font-size: 14px;
+        }
+
+        .primary-button {
+            background-color: #3b82f6;
+            color: white;
+        }
+
+        .secondary-button {
+            background-color: #e2e8f0;
+            color: #334155;
+        }
+
+        .footer {
+            background-color: #1e293b;
+            color: #f8fafc;
+            padding: 20px;
+            text-align: center;
+            font-size: 13px;
+        }
+
+        .footer p {
+            margin: 8px 0;
+            opacity: 0.8;
+        }
+
+        .divider {
+            height: 1px;
+            background-color: #e2e8f0;
             margin: 20px 0;
         }
 
-        .content h2 {
-            color: #333;
+        .highlight {
+            background-color: #fef3c7;
+            padding: 2px 4px;
+            border-radius: 4px;
         }
-
-        .cart-details {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .cart-details th,
-        .cart-details td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-
-        .cart-details th {
-            background-color: #f4f4f4;
-        }
-</style>
-
+    </style>
+</head>
 <body>
     <div class="container">
         <div class="header">
-            <img src="cid:logo" alt="Website Logo">
+            <img src="cid:logo" alt="Company Logo">
+            <h1>New Order Notification</h1>
         </div>
+
+        <div class="alert-banner">
+            ⚡ Action Required: Please verify payment and process this order
+        </div>
+
         <div class="content">
-            <h2>New Order Received</h2>
-            <p>A new order has been placed. Details are as follows:</p>
-            
-            <div class="divider">
-                <span>ORDER DETAILS</span>
-            </div>
-            <h4>Order Number: {{ordernumber}}</h4>
-            <h4>Customer Name: {{username}}</h4>
+            <div class="order-card">
+                <div class="order-card-header">
+                    <div>
+                        <span class="order-number">Order #{{ordernumber}}</span>
+                        <span class="priority-badge">HIGH PRIORITY</span>
+                    </div>
+                    <div class="order-date">{{orderDate}}</div>
+                </div>
 
-            <table class="cart-details">
-                <thead>
-                    <tr>
-                        <th>Item</th>
-                        <th>Quantity</th>
-                        <th>Price</th>
-                        <th>Total</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
+                <div class="section-title">Order Summary</div>
+
+                <table class="cart-table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Qty</th>
+                            <th>Price</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
                         {{cartItems}}
-                    </tr>
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td colspan="3" style="text-align: right;">Subtotal</td>
-                        <td>{{orderSubtotal}}</td>
-                    </tr>
-                    <tr>
-                        <td colspan="3" style="text-align: right;">Shipping</td>
-                        <td>{{orderShipping}}</td>
-                    </tr>
-                    <tr>
-                        <td colspan="3" style="text-align: right; font-weight: bold;">Total</td>
-                        <td style="font-weight: bold;">{{orderTotal}}</td>
-                    </tr>
-                </tfoot>
-            </table>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" style="text-align: right;">Subtotal</td>
+                            <td>₹{{orderSubtotal}}</td>
+                        </tr>
+                        <tr class="total-row">
+                            <td colspan="3" style="text-align: right;">Order Total</td>
+                            <td>₹{{orderTotal}}</td>
+                        </tr>
+                    </tfoot>
+                </table>
 
-            <h3>Customer Details:</h3>
-            <p>Name: {{username}}</p>
-            <p>Email: {{email}}</p>
-            <p>Mobile: {{mobile}}</p>
+                <div class="section-title">Payment Status</div>
+                <span class="payment-status">PENDING VERIFICATION</span>
+                <p style="margin-top: 8px; font-size: 14px;">Payment method: <span class="highlight">Bank Transfer</span></p>
+            </div>
 
-            <div class="address-columns">
-                <div class="address-column">
-                    <h3>Billing Address:</h3>
+            <div class="customer-details">
+                <div class="detail-box">
+                    <h3>Customer Information</h3>
+                    <p><strong>Name:</strong> {{username}}</p>
+                    <p><strong>Email:</strong> {{email}}</p>
+                    <p><strong>Phone:</strong> {{mobile}}</p>
+                </div>
+                <div class="detail-box">
+                    <h3>Billing Address</h3>
                     <p>{{addressLine1}}</p>
                     <p>{{addressLine2}}</p>
-                    <p>{{city}}, {{state}}, {{pincode}}</p>
+                    <p>{{city}}, {{state}} - {{pincode}}</p>
+                    <p>India</p>
                 </div>
             </div>
 
-            <h3>Payment Status: On Hold</h3>
-            <p>Please verify the payment and process the order accordingly.</p>
-            
-        </div>
-        <div class="footer">
-            <img src="cid:logo" alt="">
-            <p>
-                This is an automated admin notification.<br>
+            <div class="divider"></div>
+            <p style="text-align: center; font-size: 13px; color: #64748b; margin-top: 20px;">
+                This order was placed on your website. Please verify payment within 24 hours.
             </p>
         </div>
     </div>
 </body>
-
 </html>
